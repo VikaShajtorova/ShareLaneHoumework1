@@ -3,33 +3,25 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class SingUpZipCodeTest {
+    WebDriver driver;
+    @BeforeMethod
+    public void setUp(){
+        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
+        driver = new ChromeDriver();
+    }
     @Test
 
     public void zipCodeShouldAccept5Digits() {
 
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-
-        WebDriver driver = new ChromeDriver();
         driver.get("https://www.sharelane.com/cgi-bin/register.py");
-
-
-        driver.findElement(By.name("zip_code"));
-        WebElement zipCodeInput = driver.findElement(By.name("zip_code"));
-        zipCodeInput.sendKeys("12345");
-
-
-        WebElement continueButton = driver.findElement(By.cssSelector("[value=Continue]"));
-        continueButton.click();
-
-
-        WebElement registerButton = driver.findElement(By.cssSelector("[value=Register]"));
-        boolean isDisplayed = registerButton.isDisplayed();
+        driver.findElement(By.name("zip_code")).sendKeys("12345");
+        driver.findElement(By.cssSelector("[value=Continue]")).click();
+        boolean isDisplayed = driver.findElement(By.cssSelector("[value=Register]")).isDisplayed();
         Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
-
-
         driver.quit();
 
     }
