@@ -5,7 +5,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SingUpTest {
+public class SingUpZipCodeTest {
     @Test
 
     public void zipCodeShouldAccept5Digits() {
