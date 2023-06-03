@@ -3,96 +3,124 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class SingUpZipCodeTest {
-    WebDriver driver;
-    @BeforeMethod
-    public void setUp(){
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        driver = new ChromeDriver();
-    }
-    @Test
+public class SingUpZipCodeTest extends BaseTest {
+    String zipCodeInputLocator = "zip_code";
+    String continueButtonLocator = "[value=Continue]";
+    String errorMessageLocator = "[class='error_message']";
 
+    @Test
     public void zipCodeShouldAccept5Digits() {
 
         driver.get("https://www.sharelane.com/cgi-bin/register.py");
-        driver.findElement(By.name("zip_code")).sendKeys("12345");
-        driver.findElement(By.cssSelector("[value=Continue]")).click();
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("12345");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
         boolean isDisplayed = driver.findElement(By.cssSelector("[value=Register]")).isDisplayed();
         Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
-        driver.quit();
 
     }
 
     @Test
-    public void enter4DigitsInTheZip_codeField() {
+    public void input4DigitsInTheZipCodeField() {
 
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-
-        WebDriver driver = new ChromeDriver();
         driver.get("https://www.sharelane.com/cgi-bin/register.py");
-
-
-        WebElement zipCodeInput = driver.findElement(By.name("zip_code"));
-        zipCodeInput.sendKeys("1234");
-
-
-        WebElement continueButton = driver.findElement(By.cssSelector("[value=Continue]"));
-        continueButton.click();
-
-
-        WebElement errorMessage = driver.findElement(By.cssSelector("[class=error_message]"));
-        String text = errorMessage.getText();
-        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не отображается");
-
-
-        driver.quit();
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("1234");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
 
     }
 
     @Test
-    public void fillInTheRegistrationFieldsWithValidData() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
+    public void input6DigitsInTheZipCodeField() {
+
         driver.get("https://www.sharelane.com/cgi-bin/register.py");
-
-        WebElement zipCodeInput = driver.findElement(By.name("zip_code"));
-        zipCodeInput.sendKeys("12345");
-
-        WebElement continueButton = driver.findElement(By.cssSelector("[value=Continue]"));
-        continueButton.click();
-
-        WebElement registerButton = driver.findElement(By.cssSelector("[value=Register]"));
-        boolean isDisplayed = registerButton.isDisplayed();
-        Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
-
-        WebElement firstNameInput = driver.findElement(By.name("first_name"));
-        firstNameInput.sendKeys("Dima");
-
-        WebElement lastNameInput = driver.findElement(By.name("last_name"));
-        lastNameInput.sendKeys("Petrov");
-
-        WebElement emailInput = driver.findElement(By.name("email"));
-        emailInput.sendKeys("sssss@gmail.ru");
-
-        WebElement passwordInput = driver.findElement(By.xpath("//input [@name='password1']"));
-        passwordInput.sendKeys("88888");
-
-        WebElement confirmPasswordInput = driver.findElement(By.xpath("//input [@name='password2']"));
-        confirmPasswordInput.sendKeys("88888");
-
-        WebElement registerButtonInput = driver.findElement(By.cssSelector("[value=\"Register\"]"));
-        registerButtonInput.click();
-
-        WebElement registrationMessage = driver.findElement(By.xpath("//span[@class='confirmation_message']"));
-        String text1 = registrationMessage.getText();
-        Assert.assertEquals(text1, "Account is created!", "Пользователь не зарегистрировался");
-
-        driver.quit();
-
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("12345");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
 
     }
 
+    @Test
+    public void leaveZipCodeFieldEmpty() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void checkUserCanGoFromSignUpPageToRegistrationPageByClickingOnShoppingCart() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.xpath("//td[3]/a")).click();
+        String text1 = driver.findElement(By.cssSelector("[class='error_message']")).getText();
+        Assert.assertEquals(text1, "Oops, error. You must log in", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void inputEmailInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("shareLane@mail.ru");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void inputSpaceAnd4DigitsInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys(" 1234");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void input4DigitsAndSpaceInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("1234 ");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void input5UppercaseAndLowercaseLatinLettersInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("DfgHj");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void input5UppercaseAndLowercaseCyrillicLettersInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("АбвГд");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
+
+    @Test
+    public void input5CharactersInZipCodeField() {
+        driver.get("https://www.sharelane.com/cgi-bin/register.py");
+        driver.findElement(By.name(zipCodeInputLocator)).sendKeys("@!?**");
+        driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        String text = driver.findElement(By.cssSelector(errorMessageLocator)).getText();
+        Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
+
+    }
 }
