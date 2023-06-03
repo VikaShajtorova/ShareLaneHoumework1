@@ -5,47 +5,223 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SingUpRegisterTest {
+public class SingUpRegisterTest extends BaseTest {
+    String url = "https://www.sharelane.com/cgi-bin/register.py?page=1&zip_code=11111";
+    String firstnameInputLocator = "first_name";
+    String lastnameInputLocator = "last_name";
+    String emailInputLocator = "email";
+    String passwordInputLocator = "//input [@name='password1']";
+    String confirmPasswordInputLocator = "//input [@name='password2']";
+    String registerButtonLocator = "[value='Register']";
+    String errorMessageLocator = "//span[@class='error_message']";
+
+
     @Test
-    public void fillInTheRegistrationFieldsWithValidData() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-        driver.get("https://www.sharelane.com/cgi-bin/register.py");
-
-        WebElement zipCodeInput = driver.findElement(By.name("zip_code"));
-        zipCodeInput.sendKeys("12345");
-
-        WebElement continueButton = driver.findElement(By.cssSelector("[value=Continue]"));
-        continueButton.click();
-
-        WebElement registerButton = driver.findElement(By.cssSelector("[value=Register]"));
-        boolean isDisplayed = registerButton.isDisplayed();
-        Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
-
-        WebElement firstNameInput = driver.findElement(By.name("first_name"));
-        firstNameInput.sendKeys("Dima");
-
-        WebElement lastNameInput = driver.findElement(By.name("last_name"));
-        lastNameInput.sendKeys("Petrov");
-
-        WebElement emailInput = driver.findElement(By.name("email"));
-        emailInput.sendKeys("sssss@gmail.ru");
-
-        WebElement passwordInput = driver.findElement(By.xpath("//input [@name='password1']"));
-        passwordInput.sendKeys("88888");
-
-        WebElement confirmPasswordInput = driver.findElement(By.xpath("//input [@name='password2']"));
-        confirmPasswordInput.sendKeys("88888");
-
-        WebElement registerButtonInput = driver.findElement(By.cssSelector("[value=\"Register\"]"));
-        registerButtonInput.click();
-
-        WebElement registrationMessage = driver.findElement(By.xpath("//span[@class='confirmation_message']"));
-        String text1 = registrationMessage.getText();
+    public void inputValidDataIntoRegistrationForm() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath("//span[@class='confirmation_message']")).getText();
         Assert.assertEquals(text1, "Account is created!", "Пользователь не зарегистрировался");
 
-        driver.quit();
+    }
 
+    @Test
+    public void inputUppercaseLatinLettersInFirstNameFieldAndLastName() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("DIMA");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("PETROV");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath("//span[@class='confirmation_message']")).getText();
+        Assert.assertEquals(text1, "Account is created!", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputLatinLettersAndDashesInFirstNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima-Dmitry");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath("//span[@class='confirmation_message']")).getText();
+        Assert.assertEquals(text1, "Account is created!", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputLatinLettersAndDashesInLastNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov-Sidorov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath("//span[@class='confirmation_message']")).getText();
+        Assert.assertEquals(text1, "Account is created!", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void leaveAllRegistrationFieldsEmpty() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void leaveFirstNameFieldEmpty() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputSpaceInFirstNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys(" ");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+
+    @Test
+    public void inputCyrillicLettersInFirstNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Дима");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void leaveLastNameFieldEmpty() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputSpaceInLastNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys(" ");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputCyrillicLettersInLastNameField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Петров");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void leaveEmailFieldEmpty() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+
+    }
+
+    @Test
+    public void inputIncorrectDataInEmailField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("sssss@222.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+    }
+
+    @Test
+    public void input_c_CyrillicLetterInEmailAddress() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys("ssssсcc@gmail.ru");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
+    }
+
+    @Test
+    public void inputSpaceInEmailField() {
+        driver.get(url);
+        driver.findElement(By.name(firstnameInputLocator)).sendKeys("Dima");
+        driver.findElement(By.name(lastnameInputLocator)).sendKeys("Petrov");
+        driver.findElement(By.name(emailInputLocator)).sendKeys(" ");
+        driver.findElement(By.xpath(passwordInputLocator)).sendKeys("88888");
+        driver.findElement(By.xpath(confirmPasswordInputLocator)).sendKeys("88888");
+        driver.findElement(By.cssSelector(registerButtonLocator)).click();
+        String text1 = driver.findElement(By.xpath(errorMessageLocator)).getText();
+        Assert.assertEquals(text1, "Oops, error on page. Some of your fields have invalid data or email was previously used", "Пользователь не зарегистрировался");
 
     }
 }
