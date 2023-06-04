@@ -1,4 +1,5 @@
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,6 +21,18 @@ public class SingUpZipCodeTest extends BaseTest {
         driver.get(url);
         driver.findElement(By.name(zipCodeInputLocator)).sendKeys("12345");
         driver.findElement(By.cssSelector(continueButtonLocator)).click();
+        boolean isDisplayed = driver.findElement(By.cssSelector("[value=Register]")).isDisplayed();
+        Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
+
+    }
+
+    @Test
+    public void checkPressingEnterButtonAfterFillingInZipCodeFieldWithValidData() {
+
+        driver.get(url);
+        WebElement inputZipCode = driver.findElement(By.name(zipCodeInputLocator));
+        inputZipCode.sendKeys("12345");
+        inputZipCode.sendKeys(Keys.ENTER);
         boolean isDisplayed = driver.findElement(By.cssSelector("[value=Register]")).isDisplayed();
         Assert.assertTrue(isDisplayed, "Нужная страница не открылась");
 
@@ -125,4 +138,6 @@ public class SingUpZipCodeTest extends BaseTest {
         Assert.assertEquals(text, "Oops, error on page. ZIP code should have 5 digits", "Сообщение не совпадает или отсутствует");
 
     }
+
+
 }
